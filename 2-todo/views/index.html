@@ -1,0 +1,45 @@
+<body>
+
+    <div><input id="todo-item" /><button id="submit-item">Submit</button></div>
+    <div><button id="update-button">Update todo list</button></div>
+    <div>Here is the todo list of everyone in the world</div>
+    <ul id="todo-list"></ul>
+
+    <script>
+        let todoList = document.getElementById("todo-list")
+        let inputted = document.getElementById("todo-item")
+
+
+
+        let submitButton = document.getElementById("submit-item")
+        submitButton.addEventListener('click', () => {
+            fetch("/add-todo", { method: "POST", body: JSON.stringify(inputted.value) })
+            inputted.value = ""
+        })
+
+
+        let processUpdateBody = body => {
+            let parsed = JSON.parse(body)
+            todoList.innerHTML = ""
+            for (let i = 0; i < parsed.length; i++) {
+                let item = parsed[i]
+                let domNode = document.createElement("li")
+                domNode.innerText = item
+                todoList.appendChild(domNode)
+            }
+        }
+        let processUpdateResponse = response => {
+            response.text().then(processUpdateBody)
+        }
+
+        let updateButton = document.getElementById("update-button")
+        updateButton.addEventListener('click', () => {
+            fetch("/todos").then(processUpdateResponse)
+        })
+
+
+
+
+
+    </script>
+</body>

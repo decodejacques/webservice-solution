@@ -1,0 +1,28 @@
+<body>
+    <div><button id="click-button">Click me</button></div>
+    <div><button id="update-button">Update number</button></div>
+    <span>In the whole world, the button was clicked </span><span id="track-num"></span> <span> times</span>
+    <script>
+        let s = document.getElementById("track-num")
+
+        let cbutton = document.getElementById("click-button")
+        cbutton.addEventListener('click', () => {
+            fetch("/do-click", { method: "POST" })
+        })
+
+
+        let ubutton = document.getElementById("update-button")
+        let processUpdateBody = body => {
+            let parsed = JSON.parse(body)
+            s.innerText = parsed
+        }
+        let processUpdateResponse = response => {
+            response.text().then(processUpdateBody)
+        }
+        ubutton.addEventListener('click', () => {
+            fetch("/num-clicked", { method: "POST" }).then(processUpdateResponse)
+        })
+
+
+    </script>
+</body>

@@ -1,0 +1,53 @@
+<body>
+    <div><span>Your name</span> <input id="user-name" value="bob" /></div>
+    <div><span>Room name</span> <input id="room-name" value="default-room" /></div>
+    <div><span>Chat message</span> <input id="chat-message" /><button id="submit-message">Submit</button></div>
+    <div><button id="update-button">Update chat room</button></div>
+
+    <ul id="messages"></ul>
+
+    <script>
+        let userName = document.getElementById("user-name")
+        let roomName = document.getElementById("room-name")
+        let chatMessage = document.getElementById("chat-message")
+        let submitButton = document.getElementById("submit-message")
+
+        submitButton.addEventListener('click', () => {
+            fetch("/add-message", {
+                method: "POST",
+                body: JSON.stringify({
+                    msg: userName.value + ": " + chatMessage.value,
+                    room: roomName.value
+                }),
+
+            })
+            chatMessage.value = ""
+        })
+
+
+        let chatMessages = document.getElementById("messages")
+
+        let processUpdateBody = body => {
+            let parsed = JSON.parse(body)
+            chatMessages.innerHTML = ""
+            for (let i = 0; i < parsed.length; i++) {
+                let item = parsed[i]
+                let domNode = document.createElement("li")
+                domNode.innerText = item
+                chatMessages.appendChild(domNode)
+            }
+        }
+        let processUpdateResponse = response => {
+            response.text().then(processUpdateBody)
+        }
+
+        let updateButton = document.getElementById("update-button")
+        updateButton.addEventListener('click', () => {
+            fetch("/msgs", {
+                method: "POST", body: JSON.stringify({
+                    room: roomName.value
+                })
+            }).then(processUpdateResponse)
+        })
+    </script>
+</body>
